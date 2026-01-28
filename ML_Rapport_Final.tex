@@ -1,0 +1,920 @@
+%!TEX encoding = UTF-8 Unicode
+%!TEX program = xelatex
+% ============================================================================
+%          RAPPORT FINAL - TRAVAUX PRATIQUES DE MACHINE LEARNING
+%                    TP1, TP2, TP3 - ENSPY 2025
+% ============================================================================
+
+\documentclass[11pt,a4paper]{report}
+
+% ============================================================================
+%                              PACKAGES ESSENTIELS
+% ============================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+% Graphiques et médias
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+% Mathématiques
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Tableaux avancés
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{multirow}
+
+% Listes
+\usepackage{enumitem}
+
+% TikZ pour graphiques vectoriels
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc, shadows, shapes.geometric, arrows.meta, fit, backgrounds}
+
+% Stylisation avancée
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{caption}
+
+% Boîtes colorées
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable, listings}
+
+% Polices et icônes
+\usepackage{fontawesome5}
+
+% Code source
+\usepackage{listings}
+
+% Hyperliens
+\usepackage{hyperref}
+\usepackage{xurl}
+\Urlmuskip=0mu plus 1mu
+
+% ============================================================================
+%                         PALETTE DE COULEURS
+% ============================================================================
+
+\definecolor{mlPrimary}{RGB}{37, 99, 235}
+\definecolor{mlDark}{RGB}{30, 64, 175}
+\definecolor{mlLight}{RGB}{219, 234, 254}
+\definecolor{mlAccent}{RGB}{16, 185, 129}
+\definecolor{mlWarm}{RGB}{245, 158, 11}
+
+\definecolor{mlGray900}{RGB}{17, 24, 39}
+\definecolor{mlGray700}{RGB}{55, 65, 81}
+\definecolor{mlGray500}{RGB}{107, 114, 128}
+\definecolor{mlGray300}{RGB}{209, 213, 219}
+\definecolor{mlGray100}{RGB}{243, 244, 246}
+\definecolor{mlWhite}{RGB}{255, 255, 255}
+
+\definecolor{mlSuccess}{RGB}{34, 197, 94}
+\definecolor{mlWarning}{RGB}{234, 179, 8}
+\definecolor{mlError}{RGB}{239, 68, 68}
+
+% ============================================================================
+%                         CONFIGURATION DES HYPERLIENS
+% ============================================================================
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mlDark,
+    urlcolor=mlPrimary,
+    citecolor=mlDark,
+    bookmarksnumbered=true
+}
+
+% ============================================================================
+%                         BOÎTES PERSONNALISÉES
+% ============================================================================
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, breakable,
+    colback=mlLight,
+    colframe=mlPrimary,
+    boxrule=0pt, leftrule=4pt,
+    arc=0pt, outer arc=0pt,
+    left=12pt, right=12pt, top=10pt, bottom=10pt,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, breakable,
+    colback=mlGray100,
+    colframe=mlGray300,
+    fonttitle=\bfseries\sffamily,
+    title=#1,
+    boxrule=1pt, arc=6pt,
+    left=12pt, right=12pt, top=8pt, bottom=8pt,
+    attach boxed title to top left={yshift=-3mm, xshift=10pt},
+    boxed title style={colback=mlPrimary, arc=3pt}
+}
+
+\newtcolorbox{processbox}[1][]{
+    enhanced, breakable,
+    colback=mlWhite,
+    colframe=mlGray300,
+    boxrule=1pt, arc=8pt,
+    left=15pt, right=15pt, top=12pt, bottom=12pt,
+    shadow={2pt}{-2pt}{0pt}{mlGray300},
+    #1
+}
+
+\newtcolorbox{alertbox}[1][]{
+    enhanced, breakable,
+    colback=mlWarm!10,
+    colframe=mlWarm,
+    boxrule=0pt, leftrule=4pt,
+    arc=0pt, left=12pt, right=12pt, top=10pt, bottom=10pt,
+    #1
+}
+
+\newtcolorbox{successbox}[1][]{
+    enhanced, breakable,
+    colback=mlSuccess!10,
+    colframe=mlSuccess,
+    boxrule=0pt, leftrule=4pt,
+    arc=0pt, left=12pt, right=12pt, top=10pt, bottom=10pt,
+    #1
+}
+
+% ============================================================================
+%                         STYLE DES CHAPITRES
+% ============================================================================
+
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries\sffamily}
+    {\begin{tikzpicture}[remember picture, overlay]
+        \fill[mlPrimary] (current page.north west) rectangle ([yshift=-3cm]current page.north east);
+        \fill[mlAccent] ([yshift=-3cm]current page.north west) rectangle ([yshift=-3.15cm]current page.north east);
+        \node[anchor=east, text=mlWhite, font=\fontsize{72}{80}\selectfont\bfseries\sffamily]
+            at ([xshift=-2cm, yshift=-1.5cm]current page.north east) {\thechapter};
+    \end{tikzpicture}}
+    {0pt}
+    {\vspace{2cm}\textcolor{mlDark}}
+    [\vspace{0.5cm}{\color{mlGray300}\titlerule[2pt]}]
+
+\titleformat{name=\chapter,numberless}[display]
+    {\normalfont\huge\bfseries\sffamily}
+    {\begin{tikzpicture}[remember picture, overlay]
+        \fill[mlPrimary] (current page.north west) rectangle ([yshift=-2cm]current page.north east);
+        \fill[mlAccent] ([yshift=-2cm]current page.north west) rectangle ([yshift=-2.1cm]current page.north east);
+    \end{tikzpicture}}
+    {0pt}
+    {\vspace{1cm}\textcolor{mlDark}}
+    [\vspace{0.5cm}{\color{mlGray300}\titlerule[2pt]}]
+
+\titlespacing*{\chapter}{0pt}{0pt}{40pt}
+
+% ============================================================================
+%                         STYLE DES SECTIONS
+% ============================================================================
+
+\titleformat{\section}
+    {\normalfont\Large\bfseries\sffamily\color{mlPrimary}}
+    {\colorbox{mlPrimary}{\textcolor{mlWhite}{\hspace{8pt}\thesection\hspace{8pt}}}\hspace{12pt}}
+    {0pt}{}
+    [{\color{mlGray300}\titlerule[1pt]}]
+\titlespacing*{\section}{0pt}{30pt}{15pt}
+
+\titleformat{\subsection}
+    {\normalfont\large\bfseries\sffamily\color{mlDark}}
+    {\textcolor{mlPrimary}{\thesubsection}\hspace{10pt}}
+    {0pt}{}
+\titlespacing*{\subsection}{0pt}{20pt}{10pt}
+
+\titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries\sffamily\color{mlGray700}}
+    {\textcolor{mlAccent}{\thesubsubsection}\hspace{8pt}}
+    {0pt}{}
+
+% ============================================================================
+%                         STYLE TABLE DES MATIÈRES
+% ============================================================================
+
+\renewcommand{\cfttoctitlefont}{\Huge\bfseries\sffamily\color{mlDark}}
+\renewcommand{\cftchapfont}{\bfseries\sffamily\color{mlPrimary}}
+\renewcommand{\cftchappagefont}{\bfseries\color{mlPrimary}}
+\renewcommand{\cftsecfont}{\sffamily\color{mlGray900}}
+\renewcommand{\cftsubsecfont}{\sffamily\color{mlGray500}}
+\setlength{\cftbeforechapskip}{12pt}
+\setlength{\cftbeforesecskip}{6pt}
+
+% ============================================================================
+%                         STYLE DES LÉGENDES
+% ============================================================================
+
+\captionsetup{
+    labelfont={bf, sf, color=mlPrimary},
+    textfont={sf, color=mlGray700},
+    labelsep=period,
+    justification=centering,
+    font=small, skip=10pt
+}
+
+% ============================================================================
+%                         EN-TÊTES ET PIEDS DE PAGE
+% ============================================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\textcolor{mlGray500}{\leftmark}}
+\fancyhead[R]{\sffamily\small\textcolor{mlPrimary}{\textbf{Rapport ML -- ENSPY}}}
+\fancyfoot[C]{\begin{tikzpicture}[baseline]
+    \node[fill=mlPrimary, text=mlWhite, rounded corners=3pt, inner sep=5pt, font=\sffamily\small\bfseries] {\thepage};
+\end{tikzpicture}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{2pt}{\color{mlGray300}\hrule height 1pt}\vspace{1pt}{\color{mlAccent}\hrule height 2pt width 0.3\textwidth}}
+
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[C]{\begin{tikzpicture}[baseline]
+        \node[fill=mlPrimary, text=mlWhite, rounded corners=3pt, inner sep=5pt, font=\sffamily\small\bfseries] {\thepage};
+    \end{tikzpicture}}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+% ============================================================================
+%                         LISTES PERSONNALISÉES
+% ============================================================================
+
+\setlist[itemize,1]{label=\textcolor{mlPrimary}{\faChevronRight}, leftmargin=*, itemsep=6pt}
+\setlist[itemize,2]{label=\textcolor{mlAccent}{$\circ$}, leftmargin=*, itemsep=4pt}
+\setlist[enumerate,1]{label=\protect\circlednum{\arabic*}, leftmargin=*, itemsep=8pt}
+
+\newcommand*\circlednum[1]{\tikz[baseline=(char.base)]{\node[shape=circle, fill=mlPrimary, text=mlWhite, inner sep=2pt, font=\sffamily\small\bfseries] (char) {#1};}}
+
+% ============================================================================
+%                         COMMANDES UTILITAIRES
+% ============================================================================
+
+\newcommand{\concept}[1]{\textcolor{mlPrimary}{\textbf{#1}}}
+\newcommand{\tech}[1]{\texttt{\textcolor{mlDark}{#1}}}
+\newcommand{\flowto}{\textcolor{mlAccent}{\faArrowRight}}
+\newcommand{\statusok}{\textcolor{mlSuccess}{\faCheckCircle}}
+\newcommand{\statuswarn}{\textcolor{mlWarning}{\faExclamationTriangle}}
+
+\newcommand{\elegantsep}{\begin{center}\vspace{10pt}\textcolor{mlGray300}{\rule{0.2\textwidth}{0.5pt}\hspace{10pt}\textcolor{mlAccent}{\faDiamond}\hspace{10pt}\rule{0.2\textwidth}{0.5pt}}\vspace{10pt}\end{center}}
+
+% ============================================================================
+%                         CONFIGURATION LISTINGS (CODE)
+% ============================================================================
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{mlPrimary}\bfseries,
+    stringstyle=\color{mlAccent},
+    commentstyle=\color{mlGray500}\itshape,
+    numberstyle=\tiny\color{mlGray500},
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{mlGray300},
+    backgroundcolor=\color{mlGray100},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    xleftmargin=15pt,
+    framexleftmargin=15pt,
+    captionpos=b
+}
+\lstset{style=pythonstyle}
+
+% ============================================================================
+%                              DOCUMENT
+% ============================================================================
+
+\begin{document}
+
+% ============================================================================
+%                         PAGE DE TITRE
+% ============================================================================
+
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        \fill[mlGray900] (current page.south west) rectangle (current page.north east);
+        \fill[mlPrimary, opacity=0.8] (current page.north west) -- ++(0,-8) -- ++(21,0) -- ++(0,8) -- cycle;
+        \fill[mlDark, opacity=0.9] (current page.north west) -- ++(0,-6) -- ++(15,0) -- ++(6,-2) -- ++(0,8) -- cycle;
+        \foreach \x/\y/\r/\o in {15/-5/3/0.1, 18/-8/2/0.15, 3/-12/4/0.08, 17/-18/2.5/0.12} {
+            \fill[mlAccent, opacity=\o] (\x,-\y) circle (\r);
+        }
+        \draw[mlAccent, line width=2pt, opacity=0.5] (0,-10) -- (21,-10);
+        \node[anchor=center] at (10.5,-4) {
+            \begin{tikzpicture}
+                \node[circle, fill=mlWhite, minimum size=3cm, opacity=0.1] {};
+                \node[circle, fill=mlAccent, minimum size=2cm, opacity=0.2] {};
+                \node[text=mlWhite, font=\fontsize{48}{50}\selectfont] {\faBrain};
+            \end{tikzpicture}
+        };
+        \node[anchor=center, text=mlWhite] at (10.5,-9) {
+            \begin{minipage}{16cm}
+                \centering
+                {\fontsize{14}{16}\selectfont\sffamily\textcolor{mlAccent}{RAPPORT DE TRAVAUX PRATIQUES}}\\[0.8cm]
+                {\fontsize{48}{52}\selectfont\bfseries\sffamily MACHINE}\\[0.2cm]
+                {\fontsize{48}{52}\selectfont\bfseries\sffamily LEARNING}\\[1cm]
+                {\color{mlGray300}\rule{8cm}{1pt}}\\[1cm]
+                {\fontsize{18}{22}\selectfont\sffamily TP1 -- TP2 -- TP3}\\[0.3cm]
+                {\fontsize{14}{16}\selectfont\sffamily\textcolor{mlGray300}{Pipeline ML, R\'{e}gression Avanc\'{e}e \& Clustering}}
+            \end{minipage}
+        };
+        \node[anchor=south, text=mlWhite] at (10.5,-26) {
+            \begin{minipage}{16cm}
+                \centering
+                \begin{tikzpicture}
+                    \node[fill=mlGray700, rounded corners=8pt, inner sep=15pt] {
+                        \begin{tabular}{c@{\hspace{2cm}}c@{\hspace{2cm}}c}
+                            \textcolor{mlAccent}{\faUniversity} & \textcolor{mlAccent}{\faUsers} & \textcolor{mlAccent}{\faCalendarAlt} \\[5pt]
+                            \textcolor{mlWhite}{\sffamily\small ENSPY} &
+                            \textcolor{mlWhite}{\sffamily\small D\'{e}partement G\'{e}nie Informatique} &
+                            \textcolor{mlWhite}{\sffamily\small 2025}
+                        \end{tabular}
+                    };
+                \end{tikzpicture}\\[0.5cm]
+                {\sffamily\small\textcolor{mlGray500}{Enseignants : L. Fippo Fitime, C. Tinku, K. Sonfack}}
+            \end{minipage}
+        };
+    \end{tikzpicture}
+\end{titlepage}
+
+% ============================================================================
+%                         TABLE DES MATIÈRES
+% ============================================================================
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================================
+%                         INTRODUCTION GÉNÉRALE
+% ============================================================================
+
+\chapter*{Introduction g\'{e}n\'{e}rale}
+\addcontentsline{toc}{chapter}{Introduction g\'{e}n\'{e}rale}
+
+\begin{infobox}
+Le \concept{Machine Learning} (apprentissage automatique) constitue l'un des piliers de l'intelligence artificielle moderne. Il permet aux syst\`{e}mes informatiques d'apprendre \`{a} partir de donn\'{e}es sans \^{e}tre explicitement programm\'{e}s, ouvrant la voie \`{a} des applications dans des domaines aussi vari\'{e}s que la sant\'{e}, la finance, le marketing ou encore l'industrie du jeu vid\'{e}o.
+\end{infobox}
+
+\vspace{0.5cm}
+
+Ce rapport pr\'{e}sente la synth\`{e}se de trois travaux pratiques r\'{e}alis\'{e}s dans le cadre du cours de Machine Learning au D\'{e}partement de G\'{e}nie Informatique de l'\'{E}cole Nationale Sup\'{e}rieure Polytechnique de Yaound\'{e} (ENSPY). Ces TPs couvrent un spectre progressif de comp\'{e}tences~:
+
+\begin{itemize}
+    \item \textbf{TP1 -- Pipeline ML complet~:} De la pr\'{e}paration des donn\'{e}es au d\'{e}ploiement d'un mod\`{e}le de r\'{e}gression, en passant par le feature engineering et la s\'{e}lection de caract\'{e}ristiques.
+    \item \textbf{TP2 -- R\'{e}gression avanc\'{e}e et MLOps~:} \'{E}tude approfondie de la r\'{e}gularisation (Ridge, LASSO), du compromis biais-variance, et introduction aux pratiques MLOps (MLflow, Docker).
+    \item \textbf{TP3 -- Clustering et apprentissage non supervis\'{e}~:} Impl\'{e}mentation et comparaison de K-Means, GMM/EM et DBSCAN, suivi MLflow des exp\'{e}riences de clustering, et concepts th\'{e}oriques avanc\'{e}s (LDA).
+\end{itemize}
+
+\vspace{0.3cm}
+
+La d\'{e}marche suivie est rigoureusement scientifique~: pour chaque TP, nous d\'{e}finissons la probl\'{e}matique, d\'{e}crivons la m\'{e}thodologie, pr\'{e}sentons l'impl\'{e}mentation et les r\'{e}sultats, puis proposons une analyse critique. L'ensemble s'inscrit dans une perspective \concept{MLOps}, o\`{u} la reproductibilit\'{e}, la tra\c{c}abilit\'{e} et le d\'{e}ploiement sont au c\oe{}ur de la d\'{e}marche.
+
+\elegantsep
+
+% ============================================================================
+%                         CHAPITRE 1 : TP1
+% ============================================================================
+
+\chapter{TP1 -- Introduction au Pipeline ML}
+
+\section{Rappel th\'{e}orique}
+
+\subsection{Contexte}
+Le premier TP introduit le concept de \concept{pipeline de Machine Learning}, c'est-\`{a}-dire l'ensemble des \'{e}tapes n\'{e}cessaires pour transformer des donn\'{e}es brutes en un mod\`{e}le pr\'{e}dictif d\'{e}ployable. Le jeu de donn\'{e}es utilis\'{e} est le \tech{California Housing} de scikit-learn, qui contient 20\,640 observations d\'{e}crivant des blocs de logements californiens avec 8 variables pr\'{e}dictives et une variable cible (valeur m\'{e}diane des maisons).
+
+\subsection{Objectifs}
+\begin{itemize}
+    \item Ma\^{i}triser les \'{e}tapes de pr\'{e}paration et nettoyage des donn\'{e}es.
+    \item R\'{e}aliser des visualisations exploratoires pertinentes.
+    \item Appliquer le feature engineering et la s\'{e}lection de caract\'{e}ristiques.
+    \item Construire, \'{e}valuer et comparer des mod\`{e}les de r\'{e}gression.
+    \item Sauvegarder le mod\`{e}le final pour un d\'{e}ploiement ult\'{e}rieur.
+\end{itemize}
+
+\begin{definitionbox}{Pipeline ML}
+Un \concept{pipeline ML} est une s\'{e}quence structur\'{e}e d'\'{e}tapes~: collecte des donn\'{e}es \flowto{} pr\'{e}traitement \flowto{} feature engineering \flowto{} entra\^{i}nement \flowto{} \'{e}valuation \flowto{} d\'{e}ploiement.
+\end{definitionbox}
+
+\section{M\'{e}thodologie}
+
+\subsection{Phase I~: Traitement et Visualisation des Donn\'{e}es}
+
+\subsubsection{Collecte et description}
+Les donn\'{e}es sont charg\'{e}es via \tech{fetch\_california\_housing} de scikit-learn. Le DataFrame r\'{e}sultant contient 9 colonnes~: \tech{MedInc}, \tech{HouseAge}, \tech{AveRooms}, \tech{AveBedrms}, \tech{Population}, \tech{AveOccup}, \tech{Latitude}, \tech{Longitude} et \tech{Target} (valeur m\'{e}diane).
+
+\subsubsection{Analyse exploratoire}
+Les statistiques descriptives r\'{e}v\`{e}lent~:
+\begin{itemize}
+    \item Aucune valeur manquante dans le jeu de donn\'{e}es.
+    \item Des \'{e}chelles tr\`{e}s diff\'{e}rentes entre les variables (n\'{e}cessit\'{e} de standardisation).
+    \item Quelques valeurs extr\^{e}mes (ex.\ \tech{AveOccup} max $= 1243$, \tech{AveRooms} max $= 141.9$).
+\end{itemize}
+
+\subsubsection{Visualisation}
+Deux visualisations cl\'{e}s ont \'{e}t\'{e} produites~:
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP1 --- T\^{a}che 1.4 --- Histogramme de la distribution de Target
+    % Fichier image \`{a} placer : tp1_target_distribution.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Distribution de la valeur m\'{e}diane des maisons (Target)}\vspace{2cm}}}
+    \caption{Distribution de la variable cible (Target) -- TP1}
+    \label{fig:tp1_target_dist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP1 --- T\^{a}che 1.5 --- Matrice de corr\'{e}lation (heatmap)
+    % Fichier image \`{a} placer : tp1_correlation_matrix.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Matrice de corr\'{e}lation entre les variables}\vspace{2cm}}}
+    \caption{Matrice de corr\'{e}lation -- TP1}
+    \label{fig:tp1_correlation}
+\end{figure}
+
+\subsection{Phase II~: Feature Engineering et S\'{e}lection}
+
+\subsubsection{Cr\'{e}ation de nouvelles variables}
+Trois nouvelles variables ont \'{e}t\'{e} cr\'{e}\'{e}es pour enrichir la repr\'{e}sentation~:
+\begin{itemize}
+    \item \tech{RoomsPerHousehold} $= \text{AveRooms} / \text{AveOccup}$
+    \item \tech{BedroomsPerRoom} $= \text{AveBedrms} / \text{AveRooms}$
+    \item \tech{PopulationPerHousehold} $= \text{Population} / \text{AveOccup}$
+\end{itemize}
+
+\subsubsection{Standardisation}
+La standardisation \tech{StandardScaler} (moyenne $= 0$, \'{e}cart-type $= 1$) a \'{e}t\'{e} appliqu\'{e}e sur l'ensemble d'entra\^{i}nement, puis transf\'{e}r\'{e}e sur l'ensemble de test. Cette \'{e}tape est cruciale car les algorithmes \`{a} base de distance ou de gradient sont sensibles \`{a} l'\'{e}chelle des donn\'{e}es.
+
+\subsubsection{S\'{e}lection de caract\'{e}ristiques}
+Un \tech{RandomForestRegressor} a \'{e}t\'{e} utilis\'{e} pour calculer l'importance des variables. Les 5 caract\'{e}ristiques les plus importantes ont \'{e}t\'{e} identifi\'{e}es, avec \tech{MedInc} (revenu m\'{e}dian) largement en t\^{e}te.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP1 --- T\^{a}che 2.3 --- Feature Importance barplot
+    % Fichier image \`{a} placer : tp1_feature_importance.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Importance des caract\'{e}ristiques (Random Forest)}\vspace{2cm}}}
+    \caption{Importance des features -- TP1}
+    \label{fig:tp1_feature_importance}
+\end{figure}
+
+\section{Impl\'{e}mentation}
+
+\subsection{Phase III~: Construction et \'{E}valuation des Mod\`{e}les}
+
+Deux mod\`{e}les de r\'{e}gression ont \'{e}t\'{e} entra\^{i}n\'{e}s~:
+
+\begin{lstlisting}[caption={Entra\^{i}nement des mod\`{e}les -- TP1}]
+# Modele 1: Regression Lineaire
+lin_reg = LinearRegression()
+lin_reg.fit(X_train_scaled, y_train)
+
+# Modele 2: Random Forest
+forest_reg = RandomForestRegressor(
+    n_estimators=100, random_state=42, n_jobs=-1)
+forest_reg.fit(X_train_scaled, y_train)
+\end{lstlisting}
+
+L'optimisation des hyperparam\`{e}tres du Random Forest a \'{e}t\'{e} r\'{e}alis\'{e}e via \tech{GridSearchCV} (validation crois\'{e}e \`{a} 3 folds sur 108 combinaisons).
+
+\section{R\'{e}sultats}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Mod\`{e}le} & \textbf{RMSE} & \textbf{Meilleurs hyperparam\`{e}tres} \\
+        \midrule
+        R\'{e}gression Lin\'{e}aire & 0.6711 & -- \\
+        Random Forest (base) & 0.5114 & \tech{n\_estimators=100} \\
+        Random Forest (optimis\'{e}) & 0.5096 & \tech{max\_depth=30, min\_samples\_leaf=2} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparaison des mod\`{e}les -- TP1}
+    \label{tab:tp1_results}
+\end{table}
+
+\begin{successbox}
+Le Random Forest optimis\'{e} atteint un RMSE de \textbf{0.5096}, soit une am\'{e}lioration de 24\,\% par rapport \`{a} la r\'{e}gression lin\'{e}aire. Le mod\`{e}le final est sauvegard\'{e} via \tech{joblib} pour d\'{e}ploiement.
+\end{successbox}
+
+\section{Analyse critique}
+
+\begin{itemize}
+    \item La r\'{e}gression lin\'{e}aire est d\'{e}pass\'{e}e par le Random Forest, ce qui sugg\`{e}re des relations non-lin\'{e}aires dans les donn\'{e}es.
+    \item L'optimisation par GridSearchCV n'apporte qu'une am\'{e}lioration marginale (0.5114 \`{a} 0.5096), indiquant que les hyperparam\`{e}tres par d\'{e}faut \'{e}taient d\'{e}j\`{a} proches de l'optimal.
+    \item Le feature engineering (cr\'{e}ation de ratios) am\'{e}liore la qualit\'{e} des pr\'{e}dictions en capturant des relations latentes.
+    \item \textbf{Limite~:} le mod\`{e}le ne g\`{e}re pas les valeurs aberrantes de fa\c{c}on explicite. Un pr\'{e}traitement des outliers pourrait am\'{e}liorer les r\'{e}sultats.
+\end{itemize}
+
+\elegantsep
+
+% ============================================================================
+%                         CHAPITRE 2 : TP2
+% ============================================================================
+
+\chapter{TP2 -- R\'{e}gression Avanc\'{e}e et MLOps}
+
+\section{Rappel th\'{e}orique}
+
+\subsection{Contexte}
+Le deuxi\`{e}me TP approfondit les techniques de r\'{e}gression en introduisant la \concept{r\'{e}gularisation} comme m\'{e}canisme de contr\^{o}le du compromis biais-variance. Le jeu de donn\'{e}es \tech{Diabetes} de scikit-learn (442 patients, 10 variables) est utilis\'{e}.
+
+\subsection{Objectifs}
+\begin{itemize}
+    \item Comprendre le compromis biais-variance et le ph\'{e}nom\`{e}ne de sur-apprentissage.
+    \item Impl\'{e}menter et comparer OLS, Ridge (L2) et LASSO (L1).
+    \item Ma\^{i}triser l'optimisation des hyperparam\`{e}tres par validation crois\'{e}e.
+    \item Introduire les pratiques MLOps~: packaging, tracking MLflow, Docker.
+\end{itemize}
+
+\subsection{Fondements th\'{e}oriques}
+
+\begin{definitionbox}{Compromis Biais-Variance}
+L'erreur de g\'{e}n\'{e}ralisation se d\'{e}compose en~:
+\[
+\text{Erreur totale} = \text{Biais}^2 + \text{Variance} + \text{Bruit irr\'{e}ductible}
+\]
+La r\'{e}gularisation augmente l\'{e}g\`{e}rement le biais mais r\'{e}duit significativement la variance, am\'{e}liorant la g\'{e}n\'{e}ralisation.
+\end{definitionbox}
+
+\vspace{0.3cm}
+
+Les fonctions de co\^{u}t r\'{e}gularis\'{e}es s'\'{e}crivent~:
+\begin{align}
+    \text{Ridge (L2)}~&: \quad \mathcal{L} = \text{MSE} + \lambda \sum_{i} w_i^2 \\
+    \text{LASSO (L1)}~&: \quad \mathcal{L} = \text{MSE} + \lambda \sum_{i} |w_i|
+\end{align}
+
+\begin{alertbox}
+\textbf{Diff\'{e}rence cl\'{e}~:} Ridge r\'{e}duit les coefficients sans les annuler (d\'{e}riv\'{e}e $\partial w_i^2 / \partial w_i = 2w_i \to 0$), tandis que LASSO produit des z\'{e}ros exacts (d\'{e}riv\'{e}e $\partial |w_i|/\partial w_i = \text{sign}(w_i)$, constante). G\'{e}om\'{e}triquement, la contrainte L1 forme un losange dont les coins se situent sur les axes.
+\end{alertbox}
+
+\section{M\'{e}thodologie}
+
+\subsection{Phase I~: R\'{e}gression lin\'{e}aire avanc\'{e}e}
+
+\subsubsection{Pr\'{e}paration des donn\'{e}es}
+Le jeu de donn\'{e}es Diabetes est divis\'{e} en 80\,\% entra\^{i}nement / 20\,\% test, puis standardis\'{e} via \tech{StandardScaler}.
+
+\subsubsection{Mod\`{e}le OLS (baseline)}
+La r\'{e}gression OLS sert de r\'{e}f\'{e}rence avec un RMSE de 54.52 et un $R^2$ de 0.44.
+
+\subsubsection{Ridge Regression (L2)}
+Le mod\`{e}le Ridge avec $\alpha = 1.0$ est entra\^{i}n\'{e} et \'{e}valu\'{e} par validation crois\'{e}e \`{a} 5 folds. L'alpha optimal est ensuite d\'{e}termin\'{e} par \tech{RidgeCV} avec 100 valeurs de $\alpha$ dans $[10^{-3}, 10^2]$~:
+\[
+\alpha_{\text{Ridge}}^* = 55.91
+\]
+
+\subsubsection{LASSO Regression (L1)}
+Le LASSO est entra\^{i}n\'{e} de mani\`{e}re similaire. L'alpha optimal trouv\'{e} par \tech{LassoCV} est~:
+\[
+\alpha_{\text{LASSO}}^* = 0.1417
+\]
+
+Le LASSO \'{e}limine automatiquement 1 feature sur 10 (coefficient mis \`{a} z\'{e}ro), d\'{e}montrant la propri\'{e}t\'{e} de \concept{sparsity} (parcimonie).
+
+\section{Impl\'{e}mentation}
+
+\begin{lstlisting}[caption={Optimisation Ridge et LASSO -- TP2}]
+# Ridge Tuning
+ridge_cv = RidgeCV(alphas=np.logspace(-3, 2, 100), cv=10)
+ridge_cv.fit(X_train_scaled, y_train)
+
+# LASSO Tuning
+lasso_cv = LassoCV(alphas=np.logspace(-3, 0, 100),
+                   cv=10, max_iter=10000)
+lasso_cv.fit(X_train_scaled, y_train)
+\end{lstlisting}
+
+\subsection{Phase II~: MLOps}
+
+\subsubsection{Packaging du mod\`{e}le}
+Le mod\`{e}le LASSO final et le scaler sont sauvegard\'{e}s via \tech{joblib}. La sauvegarde du scaler est \textbf{cruciale}~: en production, les donn\'{e}es d'entr\'{e}e doivent subir exactement la m\^{e}me transformation que lors de l'entra\^{i}nement.
+
+\subsubsection{Tracking avec MLflow}
+Les trois mod\`{e}les (OLS, Ridge, LASSO) sont enregistr\'{e}s dans MLflow avec~:
+\begin{itemize}
+    \item \textbf{Hyperparam\`{e}tres~:} type de mod\`{e}le, alpha, type de p\'{e}nalit\'{e}.
+    \item \textbf{M\'{e}triques~:} RMSE, $R^2$, nombre de coefficients nuls (LASSO).
+    \item \textbf{Artefacts~:} mod\`{e}le s\'{e}rialis\'{e}.
+\end{itemize}
+
+\section{R\'{e}sultats}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Mod\`{e}le} & \textbf{RMSE} & \textbf{$R^2$} & \textbf{Alpha} & \textbf{Features actives} \\
+        \midrule
+        OLS & 54.52 & 0.4389 & -- & 10 \\
+        Ridge & 53.88 & 0.4521 & 55.91 & 10 \\
+        LASSO & 54.23 & 0.4449 & 0.14 & 9 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparaison des mod\`{e}les de r\'{e}gression -- TP2}
+    \label{tab:tp2_results}
+\end{table}
+
+\begin{successbox}
+Ridge obtient le meilleur RMSE (53.88) et $R^2$ (0.4521). LASSO \'{e}limine automatiquement une feature tout en conservant des performances comparables, offrant un mod\`{e}le plus interpr\'{e}table.
+\end{successbox}
+
+\section{Analyse critique}
+
+\begin{itemize}
+    \item La r\'{e}gularisation am\'{e}liore la g\'{e}n\'{e}ralisation (Ridge~: $-1.2\,\%$ RMSE vs OLS).
+    \item Le LASSO confirme sa capacit\'{e} de s\'{e}lection automatique de variables, ce qui est pr\'{e}cieux en haute dimension.
+    \item Les performances globales restent modestes ($R^2 \approx 0.45$), sugg\'{e}rant que des mod\`{e}les non-lin\'{e}aires (Random Forest, XGBoost) seraient plus adapt\'{e}s \`{a} ce jeu de donn\'{e}es.
+    \item L'int\'{e}gration MLOps (MLflow + packaging joblib) pose les bases d'un cycle de vie mod\`{e}le reproductible et auditable.
+    \item \textbf{Limite~:} le Dockerfile et l'API Flask sont pr\'{e}sent\'{e}s de mani\`{e}re th\'{e}orique et n'ont pas \'{e}t\'{e} d\'{e}ploy\'{e}s en conditions r\'{e}elles.
+\end{itemize}
+
+\elegantsep
+
+% ============================================================================
+%                         CHAPITRE 3 : TP3
+% ============================================================================
+
+\chapter{TP3 -- Clustering et Apprentissage Non Supervis\'{e}}
+
+\section{Rappel th\'{e}orique}
+
+\subsection{Contexte}
+Le troisi\`{e}me TP aborde l'\concept{apprentissage non supervis\'{e}} \`{a} travers le clustering, une technique fondamentale pour d\'{e}couvrir des structures latentes dans des donn\'{e}es non \'{e}tiquet\'{e}es. Les applications vis\'{e}es concernent la segmentation client (marketing) et l'analyse comportementale (gaming).
+
+\subsection{Objectifs}
+\begin{itemize}
+    \item Impl\'{e}menter et comparer trois familles de clustering~: K-Means, GMM/EM, DBSCAN.
+    \item Ma\^{i}triser les m\'{e}triques d'\'{e}valuation non supervis\'{e}e (inertie, coefficient de silhouette).
+    \item Tracker les exp\'{e}riences de clustering via MLflow.
+    \item \'{E}tudier les concepts th\'{e}oriques avanc\'{e}s~: initialisation K-Means++, LDA.
+\end{itemize}
+
+\subsection{Fondements th\'{e}oriques}
+
+\begin{definitionbox}{Coefficient de Silhouette}
+Pour un point $i$~:
+\[
+s(i) = \frac{b(i) - a(i)}{\max(a(i),\, b(i))}
+\]
+o\`{u} $a(i)$ est la distance intra-cluster moyenne et $b(i)$ la distance inter-cluster minimale moyenne. $s(i) \in [-1, +1]$.
+\end{definitionbox}
+
+\begin{definitionbox}{Algorithme EM pour GMM}
+Le mod\`{e}le GMM d\'{e}finit~:
+\[
+P(x) = \sum_{k=1}^{K} \pi_k \, \mathcal{N}(x \mid \mu_k, \Sigma_k)
+\]
+L'algorithme EM alterne~:
+\begin{itemize}
+    \item \textbf{\'{E}tape E~:} calcul des responsabilit\'{e}s $\gamma_{ik} = P(z_i = k \mid x_i)$.
+    \item \textbf{\'{E}tape M~:} mise \`{a} jour des param\`{e}tres $(\pi_k, \mu_k, \Sigma_k)$.
+\end{itemize}
+La vraisemblance augmente \`{a} chaque it\'{e}ration (convergence garantie vers un optimum local).
+\end{definitionbox}
+
+\section{M\'{e}thodologie}
+
+\subsection{Phase I~: K-Means et Segmentation Client}
+
+\subsubsection{Donn\'{e}es}
+Un jeu de donn\'{e}es simul\'{e} de 14 clients est cr\'{e}\'{e} avec deux variables~: \tech{Annual\_Income (k\$)} et \tech{Spending\_Score (1-100)}. Les donn\'{e}es sont standardis\'{e}es via \tech{StandardScaler}.
+
+\subsubsection{Choix du nombre de clusters}
+La m\'{e}thode du coude (Elbow Method) et le score de silhouette sont utilis\'{e}s pour d\'{e}terminer $K$ optimal. Le coude est observ\'{e} autour de $K = 3$.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP3 --- T\^{a}che 1.2 --- M\'{e}thode du coude et silhouette
+    % Fichier image \`{a} placer : elbow_method.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{M\'{e}thode du coude (inertie) et score de silhouette}\vspace{2cm}}}
+    \caption{M\'{e}thode du coude et score de silhouette -- TP3}
+    \label{fig:tp3_elbow}
+\end{figure}
+
+\subsubsection{\'{E}valuation finale}
+Le mod\`{e}le K-Means final avec $K = 3$ obtient un coefficient de silhouette de \textbf{0.6018}.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP3 --- T\^{a}che 1.3 --- Clusters K-Means finaux
+    % Fichier image \`{a} placer : kmeans_final_clustering.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Segmentation K-Means ($K=3$) avec centro\"ides}\vspace{2cm}}}
+    \caption{Segmentation K-Means finale -- TP3}
+    \label{fig:tp3_kmeans_final}
+\end{figure}
+
+\subsection{Phase II~: Clustering Avanc\'{e} et Comparaison}
+
+\subsubsection{Donn\'{e}es non-globulaires}
+Des donn\'{e}es synth\'{e}tiques en forme de croissants de lune (\tech{make\_moons}, $n = 200$) sont g\'{e}n\'{e}r\'{e}es pour tester les limites du K-Means.
+
+\subsubsection{GMM vs K-Means}
+Le mod\`{e}le GMM (\tech{GaussianMixture}) est compar\'{e} \`{a} K-Means sur les donn\'{e}es moons. Les deux algorithmes \'{e}chouent \`{a} capturer la forme non-convexe des clusters, mais GMM offre une affectation probabiliste (soft assignment).
+
+\subsubsection{DBSCAN}
+L'algorithme DBSCAN ($\varepsilon = 0.3$, \tech{min\_samples} $= 5$) identifie correctement les deux clusters non-convexes gr\^{a}ce \`{a} son approche bas\'{e}e sur la densit\'{e}.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP3 --- T\^{a}che 2.2 --- Comparaison des 3 algorithmes
+    % Fichier image \`{a} placer : three_algorithms_comparison.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Comparaison K-Means vs GMM vs DBSCAN sur donn\'{e}es moons}\vspace{2cm}}}
+    \caption{Comparaison des trois algorithmes de clustering -- TP3}
+    \label{fig:tp3_comparison}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Aspect} & \textbf{K-Means} & \textbf{GMM} & \textbf{DBSCAN} \\
+        \midrule
+        Affectation & Hard & Soft (probabiliste) & Hard + bruit \\
+        Forme des clusters & Sph\'{e}rique & Ellipso\"idale & Arbitraire \\
+        Nombre de clusters & \`{A} fixer (K) & \`{A} fixer (K) & Automatique \\
+        Gestion du bruit & Non & Non & Oui (label $-1$) \\
+        Donn\'{e}es moons & \'{E}chec & \'{E}chec partiel & Succ\`{e}s \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparaison des algorithmes de clustering -- TP3}
+    \label{tab:tp3_algo_comparison}
+\end{table}
+
+\section{Impl\'{e}mentation}
+
+\subsection{Phase III~: MLOps pour le Clustering}
+
+\subsubsection{Tracking MLflow}
+Quatre configurations de K-Means ($K = 2, 3, 4, 5$) sont track\'{e}es dans MLflow avec~:
+\begin{itemize}
+    \item \textbf{Hyperparam\`{e}tres~:} $K$, algorithme, \tech{n\_init}, \tech{random\_state}.
+    \item \textbf{M\'{e}triques~:} inertie, silhouette, Calinski-Harabasz.
+    \item \textbf{Artefacts~:} mod\`{e}le s\'{e}rialis\'{e}, centro\"ides en CSV.
+\end{itemize}
+
+\begin{lstlisting}[caption={Tracking MLflow du clustering -- TP3}]
+mlflow.set_experiment("TP3_Customer_Clustering")
+
+def track_clustering_run(X_data, k, run_name):
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(X_data)
+    with mlflow.start_run(run_name=run_name):
+        mlflow.log_param("K", k)
+        mlflow.log_metric("Silhouette_Score",
+            silhouette_score(X_data, labels))
+        mlflow.log_metric("Inertia", kmeans.inertia_)
+        mlflow.sklearn.log_model(kmeans, name="kmeans_model")
+\end{lstlisting}
+
+\subsubsection{D\'{e}ploiement et monitoring}
+Le mod\`{e}le optimal ($K = 3$) est sauvegard\'{e} avec son scaler via \tech{joblib}. Deux indicateurs de monitoring post-production sont identifi\'{e}s~:
+\begin{itemize}
+    \item \textbf{D\'{e}rive des centro\"ides~:} mesurer la distance euclidienne entre les centro\"ides originaux et ceux recalcul\'{e}s p\'{e}riodiquement.
+    \item \textbf{Distribution des tailles de clusters~:} surveiller si un segment absorbe ou perd anormalement des clients.
+\end{itemize}
+
+\subsection{Phase IV~: Concepts Th\'{e}oriques Avanc\'{e}s}
+
+\subsubsection{Comparaison des initialisations}
+L'objectif non-convexe de K-Means poss\`{e}de de multiples optima locaux. L'initialisation \concept{K-Means++} s\'{e}lectionne les centro\"ides initiaux avec une probabilit\'{e} proportionnelle \`{a} leur distance au centro\"ide le plus proche, garantissant une convergence $O(\log K)$-comp\'{e}titive par rapport \`{a} l'optimum global. Les exp\'{e}riences (20 runs) montrent une variance significativement plus faible pour K-Means++ par rapport \`{a} l'initialisation al\'{e}atoire.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP3 --- T\^{a}che 4.1 --- Comparaison des initialisations
+    % Fichier image \`{a} placer : initialization_comparison.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Comparaison K-Means++ vs Random (boxplot et inerties par run)}\vspace{2cm}}}
+    \caption{Comparaison des strat\'{e}gies d'initialisation -- TP3}
+    \label{fig:tp3_init_comparison}
+\end{figure}
+
+\subsubsection{Latent Dirichlet Allocation (LDA)}
+Le mod\`{e}le \concept{LDA} introduit la notion d'\concept{appartenance mixte} (mixed membership)~: chaque document est un m\'{e}lange de topics, et chaque topic est un m\'{e}lange de mots.
+
+\[
+P(\text{mot} \mid \text{doc}) = \sum_{k=1}^{K} P(\text{topic}_k \mid \text{doc}) \cdot P(\text{mot} \mid \text{topic}_k)
+\]
+
+Contrairement \`{a} K-Means appliqu\'{e} sur des vecteurs TF-IDF (1 document = 1 cluster), LDA permet \`{a} un document de traiter \textbf{simultan\'{e}ment} plusieurs th\`{e}mes. Une d\'{e}monstration sur un corpus de 12 documents simul\'{e}s (sport, technologie, cuisine) confirme cette capacit\'{e}~: les documents \`{a} th\'{e}matique mixte re\c{c}oivent des distributions non triviales sur plusieurs topics.
+
+\begin{figure}[H]
+    \centering
+    % === Figure \`{a} ins\'{e}rer ici ===
+    % Image g\'{e}n\'{e}r\'{e}e par : TP3 --- T\^{a}che 4.2 --- Heatmap LDA document-topic
+    % Fichier image \`{a} placer : lda_topic_distribution.png
+    \fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{Distribution document-topic (LDA) -- heatmap}\vspace{2cm}}}
+    \caption{Distribution des topics par document (LDA) -- TP3}
+    \label{fig:tp3_lda}
+\end{figure}
+
+\section{R\'{e}sultats}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{K} & \textbf{Inertie} & \textbf{Silhouette} & \textbf{Calinski-Harabasz} \\
+        \midrule
+        2 & 10.25 & 0.5616 & -- \\
+        3 & 4.42 & 0.6018 & -- \\
+        4 & 1.60 & 0.6888 & -- \\
+        5 & 0.76 & 0.7213 & -- \\
+        \bottomrule
+    \end{tabular}
+    \caption{R\'{e}sultats du tracking MLflow (K-Means) -- TP3}
+    \label{tab:tp3_mlflow}
+\end{table}
+
+\begin{successbox}
+DBSCAN se r\'{e}v\`{e}le le plus performant sur des donn\'{e}es non-globulaires. K-Means reste pertinent pour des clusters sph\'{e}riques avec un bon score de silhouette. Le tracking MLflow permet une comparaison syst\'{e}matique et reproductible des configurations.
+\end{successbox}
+
+\section{Analyse critique}
+
+\begin{itemize}
+    \item K-Means est simple et efficace pour des clusters globulaires, mais \'{e}choue compl\`{e}tement sur des formes non-convexes.
+    \item GMM offre une flexibilit\'{e} sup\'{e}rieure (clusters ellipso\"idaux, affectation probabiliste) mais reste limit\'{e} sur des formes arbitraires.
+    \item DBSCAN est le seul algorithme capable de d\'{e}tecter des clusters de forme arbitraire et de g\'{e}rer le bruit, mais il est sensible au choix de $\varepsilon$ et \tech{min\_samples}.
+    \item L'int\'{e}gration MLflow garantit la tra\c{c}abilit\'{e} et facilite la comparaison des configurations.
+    \item \textbf{Limite~:} le jeu de donn\'{e}es client est tr\`{e}s petit (14 points). Une \'{e}valuation sur des donn\'{e}es r\'{e}elles serait n\'{e}cessaire pour valider les conclusions.
+    \item La Phase IV d\'{e}montre que K-Means++ devrait toujours \^{e}tre pr\'{e}f\'{e}r\'{e} \`{a} l'initialisation al\'{e}atoire, et que LDA offre une alternative riche au clustering classique pour le texte.
+\end{itemize}
+
+\elegantsep
+
+% ============================================================================
+%                         CONCLUSION GÉNÉRALE
+% ============================================================================
+
+\chapter*{Conclusion g\'{e}n\'{e}rale}
+\addcontentsline{toc}{chapter}{Conclusion g\'{e}n\'{e}rale}
+
+\section*{Bilan}
+
+Ces trois travaux pratiques ont permis de parcourir un spectre repr\'{e}sentatif des techniques de Machine Learning, de l'apprentissage supervis\'{e} (r\'{e}gression) \`{a} l'apprentissage non supervis\'{e} (clustering), en passant par les pratiques MLOps indispensables \`{a} la mise en production.
+
+\begin{processbox}
+\textbf{Comp\'{e}tences acquises~:}
+\begin{itemize}
+    \item \textbf{TP1~:} Construction d'un pipeline ML complet, du pr\'{e}traitement au d\'{e}ploiement (RMSE final~: 0.51).
+    \item \textbf{TP2~:} Compr\'{e}hension profonde de la r\'{e}gularisation et int\'{e}gration des outils MLOps (MLflow, Docker).
+    \item \textbf{TP3~:} Ma\^{i}trise de trois familles de clustering, tracking d'exp\'{e}riences, et concepts th\'{e}oriques avanc\'{e}s (EM, LDA).
+\end{itemize}
+\end{processbox}
+
+\section*{Limites}
+
+\begin{alertbox}
+Plusieurs limitations m\'{e}ritent d'\^{e}tre not\'{e}es~:
+\begin{itemize}
+    \item Les jeux de donn\'{e}es utilis\'{e}s sont acad\'{e}miques (scikit-learn) ou simul\'{e}s. Les d\'{e}fis de donn\'{e}es r\'{e}elles (valeurs manquantes massives, d\'{e}s\'{e}quilibre, volume) ne sont pas abord\'{e}s.
+    \item Le d\'{e}ploiement Docker est pr\'{e}sent\'{e} de mani\`{e}re th\'{e}orique sans mise en \oe{}uvre r\'{e}elle.
+    \item Les mod\`{e}les de r\'{e}gression atteignent un $R^2$ plafonn\'{e} autour de 0.45 (TP2), sugg\'{e}rant que des approches non-lin\'{e}aires seraient n\'{e}cessaires.
+    \item Le monitoring post-production est d\'{e}crit conceptuellement mais non impl\'{e}ment\'{e}.
+\end{itemize}
+\end{alertbox}
+
+\section*{Perspectives}
+
+\begin{infobox}
+Pistes d'am\'{e}lioration et d'approfondissement~:
+\begin{itemize}
+    \item \textbf{Mod\`{e}les avanc\'{e}s~:} int\'{e}grer des m\'{e}thodes de boosting (XGBoost, LightGBM) et des r\'{e}seaux de neurones.
+    \item \textbf{Donn\'{e}es r\'{e}elles~:} appliquer les pipelines \`{a} des jeux de donn\'{e}es industriels avec toutes leurs imperfections.
+    \item \textbf{MLOps complet~:} impl\'{e}menter un pipeline CI/CD avec GitHub Actions, tests automatis\'{e}s et d\'{e}ploiement continu sur Kubernetes.
+    \item \textbf{Clustering avanc\'{e}~:} explorer HDBSCAN (version hi\'{e}rarchique de DBSCAN) et le spectral clustering.
+    \item \textbf{NLP et LDA~:} appliquer LDA \`{a} un vrai corpus de documents avec pr\'{e}traitement linguistique complet (lemmatisation, suppression des stopwords).
+    \item \textbf{Monitoring~:} mettre en place un syst\`{e}me de d\'{e}tection de drift avec des outils comme Evidently AI ou Whylogs.
+\end{itemize}
+\end{infobox}
+
+\vspace{1cm}
+
+\begin{center}
+\begin{tikzpicture}
+    \node[fill=mlPrimary, text=mlWhite, rounded corners=8pt, inner sep=15pt, font=\sffamily\large\bfseries] {
+        Pipeline ML \quad\faArrowRight\quad R\'{e}gularisation \quad\faArrowRight\quad Clustering \quad\faArrowRight\quad MLOps \quad\faArrowRight\quad Production
+    };
+\end{tikzpicture}
+\end{center}
+
+\end{document}
