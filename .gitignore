@@ -1,0 +1,20 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# ML model artifacts (generated at runtime)
+*.pkl
+*.joblib
+mlflow.db
+mlruns/
+
+# Data artifacts
+centroids.csv
+model_metadata.json
