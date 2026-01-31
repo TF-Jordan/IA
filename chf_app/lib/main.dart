@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'app.dart';
@@ -12,8 +13,12 @@ import 'core/theme/theme_provider.dart';
 /// To preview a widget in isolation during development,
 /// temporarily replace [ChfApp] with [WidgetWorkshop] from
 /// `workshop/widget_workshop.dart`.  See GUIDE.md §4 for details.
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize date formatting for FR and EN locales
+  await initializeDateFormatting('fr');
+  await initializeDateFormatting('en');
 
   // Lock to portrait on mobile (no effect on desktop/web)
   SystemChrome.setPreferredOrientations([
